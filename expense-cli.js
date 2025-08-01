@@ -7,8 +7,8 @@ const EXPENSE_FILE = path.join(__dirname, 'expenses.json');
 const loadExpenses = () => {
   if (!fs.existsSync(EXPENSE_FILE)) return [];
 
-  const data = fs.readFileSync(EXPENSE_FILE, 'uft8');
-  return data ? JSON.stringify(data) : [];
+  const data = fs.readFileSync(EXPENSE_FILE, 'utf8');
+  return data ? JSON.parse(data) : [];
 };
 
 // save Expenses
@@ -18,7 +18,8 @@ const saveExpenses = (expenses) => {
 
 // current Date
 const now = () => {
-  return new Date().toISOString();
+  date = new Date();
+  return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
 };
 
 // generate ID
@@ -27,13 +28,50 @@ const generateID = (expenses) => {
 };
 
 // add Expense
-const addExpense = (desciption, amount) => {};
+const addExpense = (description, amount) => {
+  let expenses = loadExpenses();
+  let expense = {
+    id: generateID(expenses),
+    description,
+    amount,
+    date: now(),
+  };
+  expenses.push(expense);
+  saveExpenses(expenses);
+  console.log(`Expense added successfully (ID: ${expense.id})`);
+};
 
 // delete Expense
 const deleteExpense = (id) => {};
 
 // list Expense
-const listExpense = () => {};
+const listExpense = () => {
+  const expenses = loadExpenses();
+  const idWidth = 5;
+  const dateWidth = 10;
+  const descWidth = 10;
+  const amountWidth = 10;
+
+  console.log(
+    '# ' +
+      'ID'.padEnd(idWidth) +
+      'Date'.padEnd(dateWidth) +
+      'Description'.padEnd(descWidth) +
+      'Amount'.padStart(amountWidth)
+  );
+
+  expenses.forEach((expense) => {
+    console.log(
+      '# ' +
+        String(expense.id).padEnd(idWidth) +
+        String(expense.date).padEnd(dateWidth) +
+        String(expense.description || expense.desciption || '').padEnd(
+          descWidth
+        ) +
+        String(expense.amount).padStart(amountWidth - 3)
+    );
+  });
+};
 
 // show summary of Expenses
 const summaryExpense = () => {};
@@ -47,12 +85,14 @@ const command = args[0];
 
 switch (command) {
   case 'add':
+    addExpense(args[2], parseInt(args[4]));
     break;
 
   case 'delete':
     break;
 
   case 'list':
+    listExpense();
     break;
 
   case 'summary':
