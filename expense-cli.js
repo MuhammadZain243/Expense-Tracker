@@ -74,7 +74,15 @@ const listExpense = () => {
 };
 
 // show summary of Expenses
-const summaryExpense = () => {};
+const summaryExpense = () => {
+  const expenses = loadExpenses();
+  let total = 0;
+  expenses.forEach((expenses) => {
+    total += expenses.amount;
+  });
+
+  console.log(`Total expenses: $${total}`);
+};
 
 // export Expenses data
 const exportExpenseData = () => {};
@@ -96,6 +104,7 @@ switch (command) {
     break;
 
   case 'summary':
+    summaryExpense();
     break;
 
   case 'export':
