@@ -120,6 +120,7 @@ switch (command) {
     break;
 
   case 'export':
+    exportExpenseData();
     break;
 
   default:
