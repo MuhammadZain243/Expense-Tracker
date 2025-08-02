@@ -42,7 +42,18 @@ const addExpense = (description, amount) => {
 };
 
 // delete Expense
-const deleteExpense = (id) => {};
+const deleteExpense = (id) => {
+  let expenses = loadExpenses();
+  const index = expenses.findIndex((e) => e.id === id);
+
+  // Not found case
+  if (index === -1) return console.log('Expense Id not found');
+
+  // Found case
+  expenses.splice(index, 1);
+  saveExpenses(expenses);
+  console.log('Expense deleted successfully');
+};
 
 // list Expense
 const listExpense = () => {
@@ -97,6 +108,7 @@ switch (command) {
     break;
 
   case 'delete':
+    deleteExpense(parseInt(args[2]));
     break;
 
   case 'list':
