@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const XLSX = require('xlsx');
 
 const EXPENSE_FILE = path.join(__dirname, 'expenses.json');
 
@@ -19,7 +20,7 @@ const saveExpenses = (expenses) => {
 // current Date
 const now = () => {
   date = new Date();
-  return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 };
 
 // generate ID
@@ -85,18 +86,38 @@ const listExpense = () => {
 };
 
 // show summary of Expenses
-const summaryExpense = () => {
+const summaryExpense = (filter = null) => {
   const expenses = loadExpenses();
   let total = 0;
-  expenses.forEach((expenses) => {
-    total += expenses.amount;
+
+  const filtered = filter
+    ? expenses.filter((e) => parseInt(e.date.split('-')[1]) === filter)
+    : expenses;
+
+  filtered.forEach((expense) => {
+    total += expense.amount;
   });
 
   console.log(`Total expenses: $${total}`);
 };
 
 // export Expenses data
-const exportExpenseData = () => {};
+const exportExpenseData = () => {
+  const expenses = loadExpenses();
+
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Convert JSON data to a worksheet
+  const worksheet = XLSX.utils.json_to_sheet(expenses);
+
+  // Append the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+  // Export the workbook as an Excel file
+  XLSX.writeFile(workbook, 'expense.xlsx');
+  console.log('Export successfully');
+};
 
 // CLI argument parsing
 const args = process.argv.slice(2);
@@ -116,7 +137,7 @@ switch (command) {
     break;
 
   case 'summary':
-    summaryExpense();
+    summaryExpense(parseInt(args[2]));
     break;
 
   case 'export':
